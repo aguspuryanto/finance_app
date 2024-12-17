@@ -55,7 +55,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   // Jenis Transaksi (Pemasukan/Pengeluaran)
                   Card(
                     elevation: 0,
-                    color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     child: Padding(
                       padding: const EdgeInsets.all(4.0),
                       child: Row(
@@ -129,7 +129,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   _buildLabel('Kategori'),
                   Card(
                     elevation: 0,
-                    color: theme.colorScheme.surfaceVariant.withOpacity(0.3),
+                    color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
                     child: ListTile(
                       title: DropdownButtonHideUnderline(
                         child: DropdownButton<String>(

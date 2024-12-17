@@ -6,7 +6,7 @@ import '../providers/transaction_provider.dart';
 import 'add_transaction_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +63,7 @@ class HomeScreen extends StatelessWidget {
               // Main content
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.background,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(32),
                   ),
