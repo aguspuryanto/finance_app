@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../../providers/asset_provider.dart';
 import 'add_asset_screen.dart';
 import 'edit_asset_screen.dart';
+import 'asset_installments_screen.dart';
 
 class AssetListScreen extends StatefulWidget {
   const AssetListScreen({super.key});
@@ -271,6 +272,21 @@ class _AssetListScreenState extends State<AssetListScreen> {
                                   fontSize: 12,
                                 ),
                               ),
+                              if (asset.status == 'Kredit') ...[
+                                const SizedBox(height: 8),
+                                TextButton.icon(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AssetInstallmentsScreen(asset: asset),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.payment),
+                                  label: const Text('Lihat Angsuran'),
+                                ),
+                              ],
                             ],
                           ),
                         ),

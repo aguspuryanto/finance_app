@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'providers/transaction_provider.dart';
 import 'providers/category_provider.dart';
 import 'providers/asset_provider.dart';
+import 'providers/asset_installment_provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/add_transaction_screen.dart';
 
@@ -34,6 +35,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => TransactionProvider()),
         ChangeNotifierProvider(create: (context) => CategoryProvider()),
         ChangeNotifierProvider(create: (context) => AssetProvider()),
+        ChangeNotifierProvider(create: (_) => AssetInstallmentProvider()),
       ],
       child: MaterialApp(
         title: 'Aplikasi Keuangan',
