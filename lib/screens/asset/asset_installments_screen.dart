@@ -32,161 +32,175 @@ class _AssetInstallmentsScreenState extends State<AssetInstallmentsScreen> {
     _amountController.text = installment.amount.toString();
     _notesController.text = installment.notes ?? '';
     _dueDate = DateTime.parse(installment.dueDate);
+    bool isPaid = installment.isPaid;
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Angsuran'),
-        content: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Jumlah Angsuran',
-                  prefixText: 'Rp ',
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Jumlah harus diisi';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Masukkan angka yang valid';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                title: const Text('Tanggal Jatuh Tempo'),
-                subtitle: Text(
-                  DateFormat('dd MMMM yyyy').format(_dueDate),
-                ),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final picked = await showDatePicker(
-                    context: context,
-                    initialDate: _dueDate,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2100),
-                  );
-                  if (picked != null) {
-                    setState(() {
-                      _dueDate = picked;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _notesController,
-                decoration: const InputDecoration(
-                  labelText: 'Catatan (Opsional)',
-                ),
-                maxLines: 2,
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Show delete confirmation
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Hapus Angsuran'),
-                  content: const Text(
-                    'Apakah Anda yakin ingin menghapus angsuran ini?',
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Edit Angsuran'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _amountController,
+                  decoration: const InputDecoration(
+                    labelText: 'Jumlah Angsuran',
+                    prefixText: 'Rp ',
                   ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Batal'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Provider.of<AssetInstallmentProvider>(
-                          context,
-                          listen: false,
-                        ).deleteInstallment(
-                          installment.id!,
-                          widget.asset.id!,
-                        ).then((_) {
-                          Navigator.pop(context); // Close delete dialog
-                          Navigator.pop(context); // Close edit dialog
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Angsuran berhasil dihapus'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        });
-                      },
-                      child: const Text(
-                        'Hapus',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                  ],
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Jumlah harus diisi';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Masukkan angka yang valid';
+                    }
+                    return null;
+                  },
                 ),
-              );
-            },
-            child: const Text(
-              'Hapus',
-              style: TextStyle(color: Colors.red),
+                const SizedBox(height: 16),
+                ListTile(
+                  title: const Text('Tanggal Jatuh Tempo'),
+                  subtitle: Text(
+                    DateFormat('dd MMMM yyyy').format(_dueDate),
+                  ),
+                  trailing: const Icon(Icons.calendar_today),
+                  onTap: () async {
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate: _dueDate,
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (picked != null) {
+                      setState(() {
+                        _dueDate = picked;
+                      });
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: const Text('Status Pembayaran'),
+                  subtitle: Text(isPaid ? 'Lunas' : 'Belum Dibayar'),
+                  value: isPaid,
+                  onChanged: (bool value) {
+                    setState(() {
+                      isPaid = value;
+                    });
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _notesController,
+                  decoration: const InputDecoration(
+                    labelText: 'Catatan (Opsional)',
+                  ),
+                  maxLines: 2,
+                ),
+              ],
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                final updatedInstallment = AssetInstallment(
-                  id: installment.id,
-                  assetId: widget.asset.id!,
-                  amount: double.parse(_amountController.text),
-                  dueDate: DateFormat('yyyy-MM-dd').format(_dueDate),
-                  isPaid: installment.isPaid,
-                  paidDate: installment.paidDate,
-                  notes: _notesController.text.isEmpty
-                      ? null
-                      : _notesController.text,
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Show delete confirmation
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Hapus Angsuran'),
+                    content: const Text(
+                      'Apakah Anda yakin ingin menghapus angsuran ini?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Provider.of<AssetInstallmentProvider>(
+                            context,
+                            listen: false,
+                          ).deleteInstallment(
+                            installment.id!,
+                            widget.asset.id!,
+                          ).then((_) {
+                            Navigator.pop(context); // Close delete dialog
+                            Navigator.pop(context); // Close edit dialog
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Angsuran berhasil dihapus'),
+                                backgroundColor: Colors.green,
+                              ),
+                            );
+                          });
+                        },
+                        child: const Text(
+                          'Hapus',
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ),
+                    ],
+                  ),
                 );
+              },
+              child: const Text(
+                'Hapus',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  final updatedInstallment = AssetInstallment(
+                    id: installment.id,
+                    assetId: widget.asset.id!,
+                    amount: double.parse(_amountController.text),
+                    dueDate: DateFormat('yyyy-MM-dd').format(_dueDate),
+                    isPaid: isPaid,
+                    paidDate: isPaid ? DateTime.now().toIso8601String().split('T')[0] : null,
+                    notes: _notesController.text.isEmpty
+                        ? null
+                        : _notesController.text,
+                  );
 
-                Provider.of<AssetInstallmentProvider>(context, listen: false)
-                    .updateInstallment(installment.id!, updatedInstallment)
-                    .then((_) {
-                  Navigator.pop(context);
-                  _amountController.clear();
-                  _notesController.clear();
-                  setState(() {
-                    _dueDate = DateTime.now();
+                  Provider.of<AssetInstallmentProvider>(context, listen: false)
+                      .updateInstallment(installment.id!, updatedInstallment)
+                      .then((_) {
+                    Navigator.pop(context);
+                    _amountController.clear();
+                    _notesController.clear();
+                    setState(() {
+                      _dueDate = DateTime.now();
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Angsuran berhasil diperbarui'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  }).catchError((error) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: $error'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Angsuran berhasil diperbarui'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                }).catchError((error) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Error: $error'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                });
-              }
-            },
-            child: const Text('Simpan'),
-          ),
-        ],
+                }
+              },
+              child: const Text('Simpan'),
+            ),
+          ],
+        ),
       ),
     );
   }
