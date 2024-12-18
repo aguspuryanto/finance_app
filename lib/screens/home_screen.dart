@@ -7,6 +7,7 @@ import 'add_transaction_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'reports/weekly_report_screen.dart';
 import 'reports/monthly_report_screen.dart';
+import 'asset/asset_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -102,6 +103,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const MonthlyReportScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet),
+              title: const Text('Aset'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AssetListScreen(),
                   ),
                 );
               },
