@@ -114,7 +114,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
                       hintText: 'Contoh: 500000',
-                      prefixIcon: Icon(Icons.attach_money),
+                      prefixText: 'Rp ',
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty || double.tryParse(value) == null) {
