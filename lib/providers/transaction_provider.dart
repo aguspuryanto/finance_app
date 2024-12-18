@@ -6,8 +6,10 @@ class TransactionProvider with ChangeNotifier {
   final List<Map<String, dynamic>> _transactions = [];
   final _dbHelper = DBHelper();
   RealtimeChannel? _transactionChannel;
+  bool _isLoading = true;
 
   List<Map<String, dynamic>> get transactions => [..._transactions];
+  bool get isLoading => _isLoading;
 
   TransactionProvider() {
     _initializeRealtime();
@@ -35,11 +37,18 @@ class TransactionProvider with ChangeNotifier {
 
   Future<void> fetchTransactions() async {
     try {
+      _isLoading = true;
+      notifyListeners();
+      
       final transactions = await _dbHelper.getTransactions();
       _transactions.clear();
       _transactions.addAll(transactions);
+      
+      _isLoading = false;
       notifyListeners();
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       debugPrint('Error fetching transactions: $e');
     }
   }

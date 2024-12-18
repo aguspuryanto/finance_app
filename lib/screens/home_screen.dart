@@ -4,9 +4,29 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import '../providers/transaction_provider.dart';
 import 'add_transaction_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'reports/weekly_report_screen.dart';
+import 'reports/monthly_report_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('Checking Supabase connection...');
+    final supabase = Supabase.instance.client;
+    supabase
+        .from('transactions')
+        .select('count')
+        .then((_) => debugPrint('Connected to Supabase'))
+        .catchError((e) => debugPrint('Error connecting to Supabase: $e'));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,83 +49,218 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              // Header with balance
-              Container(
-                padding: const EdgeInsets.fromLTRB(20, 40, 20, 40),
-                child: Column(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Aplikasi Keuangan',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Menu Laporan',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_view_week),
+              title: const Text('Laporan Mingguan'),
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const WeeklyReportScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.calendar_month),
+              title: const Text('Laporan Bulanan'),
+              onTap: () {
+                Navigator.pop(context); // Close drawer
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MonthlyReportScreen(),
+                  ),
+                );
+              },
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.info_outline),
+              title: const Text('Tentang Aplikasi'),
+              onTap: () {
+                Navigator.pop(context);
+                showAboutDialog(
+                  context: context,
+                  applicationName: 'Aplikasi Keuangan',
+                  applicationVersion: '1.0.0',
+                  applicationIcon: const FlutterLogo(size: 32),
                   children: [
                     const Text(
-                      'Saldo Saat Ini',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      currencyFormat.format(balance),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 48,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.5,
-                      ),
+                      'Aplikasi untuk mencatat dan mengelola keuangan pribadi.',
                     ),
                   ],
-                ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              final transactionProvider = 
+                Provider.of<TransactionProvider>(context, listen: false);
+              transactionProvider.fetchTransactions();
+            },
+          ),
+        ],
+      ),
+      body: SafeArea(
+        child: transactionProvider.isLoading 
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    color: Colors.white,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Memuat data...',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
               ),
-
-              // Main content
-              Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(32),
+            )
+          : SingleChildScrollView(
+            child: Column(
+              children: [
+                // Header with balance
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 40, 20, 40),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Saldo Saat Ini',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        currencyFormat.format(balance),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 48,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Column(
-                  children: [
-                    // Income and Expense Summary
-                    Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _buildSummaryCard(
-                              context,
-                              'Pemasukan',
-                              totalIncome,
-                              Icons.arrow_downward,
-                              Colors.green,
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildSummaryCard(
-                              context,
-                              'Pengeluaran',
-                              totalExpense,
-                              Icons.arrow_upward,
-                              Colors.red,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
-                    // Chart
-                    if (totalIncome > 0 || totalExpense > 0) ...[
+                // Main content
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(32),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      // Income and Expense Summary
+                      Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _buildSummaryCard(
+                                context,
+                                'Pemasukan',
+                                totalIncome,
+                                Icons.arrow_downward,
+                                Colors.green,
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: _buildSummaryCard(
+                                context,
+                                'Pengeluaran',
+                                totalExpense,
+                                Icons.arrow_upward,
+                                Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Chart
+                      if (totalIncome > 0 || totalExpense > 0) ...[
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Grafik Keuangan',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 220,
+                          child: _buildPieChart(totalIncome, totalExpense),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // Recent Transactions
                       const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 24.0),
+                        padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
                         child: Row(
                           children: [
                             Text(
-                              'Grafik Keuangan',
+                              'Transaksi Terakhir',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -114,208 +269,186 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 220,
-                        child: _buildPieChart(totalIncome, totalExpense),
-                      ),
-                      const SizedBox(height: 16),
-                    ],
 
-                    // Recent Transactions
-                    const Padding(
-                      padding: EdgeInsets.fromLTRB(24, 8, 24, 16),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Transaksi Terakhir',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    // Transactions List
-                    transactions.isEmpty
-                        ? Padding(
-                            padding: const EdgeInsets.all(32.0),
-                            child: Column(
-                              children: [
-                                Icon(
-                                  Icons.receipt_long_outlined,
-                                  size: 64,
-                                  color: Colors.grey[400],
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  'Belum ada transaksi',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 16,
+                      // Transactions List
+                      transactions.isEmpty
+                          ? Padding(
+                              padding: const EdgeInsets.all(32.0),
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.receipt_long_outlined,
+                                    size: 64,
+                                    color: Colors.grey[400],
                                   ),
-                                ),
-                              ],
-                            ),
-                          )
-                        : ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: transactions.length,
-                            itemBuilder: (context, index) {
-                              final tx = transactions[index];
-                              return Card(
-                                margin: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 6,
-                                ),
-                                elevation: 0.5,
-                                child: Dismissible(
-                                  key: Key(tx['id'].toString()),
-                                  background: Container(
-                                    color: Colors.red,
-                                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                                    alignment: Alignment.centerRight,
-                                    child: const Icon(
-                                      Icons.delete,
-                                      color: Colors.white,
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    'Belum ada transaksi',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 16,
                                     ),
                                   ),
-                                  direction: DismissDirection.endToStart,
-                                  confirmDismiss: (direction) async {
-                                    return await showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Konfirmasi'),
-                                          content: const Text('Yakin ingin menghapus transaksi ini?'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              onPressed: () => Navigator.of(context).pop(false),
-                                              child: const Text('Batal'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () => Navigator.of(context).pop(true),
-                                              child: const Text(
-                                                'Hapus',
-                                                style: TextStyle(color: Colors.red),
+                                ],
+                              ),
+                            )
+                          : ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: transactions.length,
+                              itemBuilder: (context, index) {
+                                final tx = transactions[index];
+                                return Card(
+                                  margin: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 6,
+                                  ),
+                                  elevation: 0.5,
+                                  child: Dismissible(
+                                    key: Key(tx['id'].toString()),
+                                    background: Container(
+                                      color: Colors.red,
+                                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                                      alignment: Alignment.centerRight,
+                                      child: const Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    direction: DismissDirection.endToStart,
+                                    confirmDismiss: (direction) async {
+                                      return await showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text('Konfirmasi'),
+                                            content: const Text('Yakin ingin menghapus transaksi ini?'),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(false),
+                                                child: const Text('Batal'),
                                               ),
+                                              TextButton(
+                                                onPressed: () => Navigator.of(context).pop(true),
+                                                child: const Text(
+                                                  'Hapus',
+                                                  style: TextStyle(color: Colors.red),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    onDismissed: (direction) {
+                                      transactionProvider.deleteTransaction(tx['id']);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Transaksi berhasil dihapus'),
+                                          behavior: SnackBarBehavior.floating,
+                                        ),
+                                      );
+                                    },
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      leading: CircleAvatar(
+                                        radius: 24,
+                                        backgroundColor: tx['type'] == 'Pemasukan'
+                                            ? Colors.green[50]
+                                            : Colors.red[50],
+                                        child: Icon(
+                                          tx['type'] == 'Pemasukan'
+                                              ? Icons.arrow_downward
+                                              : Icons.arrow_upward,
+                                          color: tx['type'] == 'Pemasukan'
+                                              ? Colors.green
+                                              : Colors.red,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        tx['title'],
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        '${tx['category']} • ${tx['date']}',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                      trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            currencyFormat.format(tx['amount']),
+                                            style: TextStyle(
+                                              color: tx['type'] == 'Pemasukan'
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
                                             ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                  onDismissed: (direction) {
-                                    transactionProvider.deleteTransaction(tx['id']);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Transaksi berhasil dihapus'),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  },
-                                  child: ListTile(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    leading: CircleAvatar(
-                                      radius: 24,
-                                      backgroundColor: tx['type'] == 'Pemasukan'
-                                          ? Colors.green[50]
-                                          : Colors.red[50],
-                                      child: Icon(
-                                        tx['type'] == 'Pemasukan'
-                                            ? Icons.arrow_downward
-                                            : Icons.arrow_upward,
-                                        color: tx['type'] == 'Pemasukan'
-                                            ? Colors.green
-                                            : Colors.red,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      tx['title'],
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      '${tx['category']} • ${tx['date']}',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          currencyFormat.format(tx['amount']),
-                                          style: TextStyle(
-                                            color: tx['type'] == 'Pemasukan'
-                                                ? Colors.green
-                                                : Colors.red,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
                                           ),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(Icons.delete_outline),
-                                          color: Colors.red[300],
-                                          onPressed: () async {
-                                            final confirm = await showDialog<bool>(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return AlertDialog(
-                                                  title: const Text('Konfirmasi'),
-                                                  content: const Text('Yakin ingin menghapus transaksi ini?'),
-                                                  actions: <Widget>[
-                                                    TextButton(
-                                                      onPressed: () => Navigator.of(context).pop(false),
-                                                      child: const Text('Batal'),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () => Navigator.of(context).pop(true),
-                                                      child: const Text(
-                                                        'Hapus',
-                                                        style: TextStyle(color: Colors.red),
+                                          IconButton(
+                                            icon: const Icon(Icons.delete_outline),
+                                            color: Colors.red[300],
+                                            onPressed: () async {
+                                              final confirm = await showDialog<bool>(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return AlertDialog(
+                                                    title: const Text('Konfirmasi'),
+                                                    content: const Text('Yakin ingin menghapus transaksi ini?'),
+                                                    actions: <Widget>[
+                                                      TextButton(
+                                                        onPressed: () => Navigator.of(context).pop(false),
+                                                        child: const Text('Batal'),
                                                       ),
-                                                    ),
-                                                  ],
-                                                );
-                                              },
-                                            );
+                                                      TextButton(
+                                                        onPressed: () => Navigator.of(context).pop(true),
+                                                        child: const Text(
+                                                          'Hapus',
+                                                          style: TextStyle(color: Colors.red),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                              );
 
-                                            if (confirm == true) {
-                                              transactionProvider.deleteTransaction(tx['id']);
-                                              if (context.mounted) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text('Transaksi berhasil dihapus'),
-                                                    behavior: SnackBarBehavior.floating,
-                                                  ),
-                                                );
+                                              if (confirm == true) {
+                                                transactionProvider.deleteTransaction(tx['id']);
+                                                if (context.mounted) {
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text('Transaksi berhasil dihapus'),
+                                                      behavior: SnackBarBehavior.floating,
+                                                    ),
+                                                  );
+                                                }
                                               }
-                                            }
-                                          },
-                                        ),
-                                      ],
+                                            },
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
-                          ),
-                    const SizedBox(height: 80),
-                  ],
+                                );
+                              },
+                            ),
+                      const SizedBox(height: 80),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {

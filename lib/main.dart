@@ -9,10 +9,16 @@ import 'screens/add_transaction_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await Supabase.initialize(
-    url: 'https://cltgxntkqfjwuoyqeqmk.supabase.co',  // Get this from your Supabase project settings
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsdGd4bnRrcWZqd3VveXFlcW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0MDgyMTIsImV4cCI6MjA0OTk4NDIxMn0.79zvM5HDq08kYn2w9XNilUBgd9RqnA1MHzt1f-nulG8',  // Get this from your Supabase project settings
-  );
+  try {
+    await Supabase.initialize(
+      url: 'https://cltgxntkqfjwuoyqeqmk.supabase.co',  // Ganti dengan URL Supabase Anda
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsdGd4bnRrcWZqd3VveXFlcW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0MDgyMTIsImV4cCI6MjA0OTk4NDIxMn0.79zvM5HDq08kYn2w9XNilUBgd9RqnA1MHzt1f-nulG8',  // Ganti dengan Anon Key Anda
+      debug: true  // Tambahkan ini untuk debug
+    );
+    debugPrint('Supabase initialized successfully');
+  } catch (e) {
+    debugPrint('Error initializing Supabase: $e');
+  }
   
   runApp(const MyApp());
 }
