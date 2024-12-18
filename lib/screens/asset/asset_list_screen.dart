@@ -161,26 +161,53 @@ class _AssetListScreenState extends State<AssetListScreen> {
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: profit >= 0
-                                          ? Colors.green[50]
-                                          : Colors.red[50],
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '${profitPercentage >= 0 ? '+' : ''}${profitPercentage.toStringAsFixed(1)}%',
-                                      style: TextStyle(
-                                        color: profit >= 0
-                                            ? Colors.green[700]
-                                            : Colors.red[700],
-                                        fontWeight: FontWeight.bold,
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: asset.status == 'Lunas' 
+                                              ? Colors.green[50] 
+                                              : Colors.orange[50],
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          asset.status,
+                                          style: TextStyle(
+                                            color: asset.status == 'Lunas' 
+                                                ? Colors.green[700] 
+                                                : Colors.orange[700],
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: profit >= 0
+                                              ? Colors.green[50]
+                                              : Colors.red[50],
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          '${profitPercentage >= 0 ? '+' : ''}${profitPercentage.toStringAsFixed(1)}%',
+                                          style: TextStyle(
+                                            color: profit >= 0
+                                                ? Colors.green[700]
+                                                : Colors.red[700],
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

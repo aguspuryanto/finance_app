@@ -20,6 +20,7 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
   late TextEditingController _currentValueController;
   late TextEditingController _notesController;
   late DateTime _purchaseDate;
+  late String _status;
 
   @override
   void initState() {
@@ -33,6 +34,7 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
     );
     _notesController = TextEditingController(text: widget.asset.notes);
     _purchaseDate = DateTime.parse(widget.asset.purchaseDate);
+    _status = widget.asset.status;
   }
 
   @override
@@ -155,6 +157,29 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
               },
             ),
             const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _status,
+              decoration: const InputDecoration(
+                labelText: 'Status',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'Lunas',
+                  child: Text('Lunas'),
+                ),
+                DropdownMenuItem(
+                  value: 'Kredit',
+                  child: Text('Kredit'),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _status = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _notesController,
               decoration: const InputDecoration(
@@ -173,6 +198,7 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
                     purchaseValue: double.parse(_purchaseValueController.text),
                     currentValue: double.parse(_currentValueController.text),
                     purchaseDate: DateFormat('yyyy-MM-dd').format(_purchaseDate),
+                    status: _status,
                     notes: _notesController.text.isEmpty
                         ? null
                         : _notesController.text,

@@ -18,6 +18,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
   final _currentValueController = TextEditingController();
   final _notesController = TextEditingController();
   DateTime _purchaseDate = DateTime.now();
+  String _status = 'Lunas';
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +104,29 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
               },
             ),
             const SizedBox(height: 16),
+            DropdownButtonFormField<String>(
+              value: _status,
+              decoration: const InputDecoration(
+                labelText: 'Status',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(
+                  value: 'Lunas',
+                  child: Text('Lunas'),
+                ),
+                DropdownMenuItem(
+                  value: 'Kredit',
+                  child: Text('Kredit'),
+                ),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _status = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _notesController,
               decoration: const InputDecoration(
@@ -120,6 +144,7 @@ class _AddAssetScreenState extends State<AddAssetScreen> {
                     purchaseValue: double.parse(_purchaseValueController.text),
                     currentValue: double.parse(_currentValueController.text),
                     purchaseDate: DateFormat('yyyy-MM-dd').format(_purchaseDate),
+                    status: _status,
                     notes: _notesController.text.isEmpty
                         ? null
                         : _notesController.text,

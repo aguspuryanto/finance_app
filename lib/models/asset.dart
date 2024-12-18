@@ -4,6 +4,7 @@ class Asset {
   final double purchaseValue;
   final double currentValue;
   final String purchaseDate;
+  final String status;
   final String? notes;
 
   Asset({
@@ -12,6 +13,7 @@ class Asset {
     required this.purchaseValue,
     required this.currentValue,
     required this.purchaseDate,
+    required this.status,
     this.notes,
   });
 
@@ -21,6 +23,7 @@ class Asset {
       'purchase_value': purchaseValue,
       'current_value': currentValue,
       'purchase_date': purchaseDate,
+      'status': status,
       'notes': notes,
     };
   }
@@ -32,6 +35,7 @@ class Asset {
       purchaseValue: map['purchase_value'],
       currentValue: map['current_value'],
       purchaseDate: map['purchase_date'],
+      status: map['status'] ?? 'Lunas',
       notes: map['notes'],
     );
   }
