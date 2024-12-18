@@ -19,6 +19,7 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
   late TextEditingController _purchaseValueController;
   late TextEditingController _currentValueController;
   late TextEditingController _notesController;
+  late TextEditingController _creditValueController;
   late DateTime _purchaseDate;
   late String _status;
 
@@ -35,6 +36,9 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
     _notesController = TextEditingController(text: widget.asset.notes);
     _purchaseDate = DateTime.parse(widget.asset.purchaseDate);
     _status = widget.asset.status;
+    _creditValueController = TextEditingController(
+      text: widget.asset.creditValue?.toString() ?? '0',
+    );
   }
 
   @override
@@ -109,6 +113,25 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Nilai beli harus diisi';
+                }
+                if (double.tryParse(value) == null) {
+                  return 'Masukkan angka yang valid';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _creditValueController,
+              decoration: const InputDecoration(
+                labelText: 'Nilai Kredit',
+                border: OutlineInputBorder(),
+                prefixText: 'Rp ',
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Nilai kredit harus diisi';
                 }
                 if (double.tryParse(value) == null) {
                   return 'Masukkan angka yang valid';
@@ -196,6 +219,7 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
                     id: widget.asset.id,
                     name: _nameController.text,
                     purchaseValue: double.parse(_purchaseValueController.text),
+                    creditValue: double.parse(_creditValueController.text),
                     currentValue: double.parse(_currentValueController.text),
                     purchaseDate: DateFormat('yyyy-MM-dd').format(_purchaseDate),
                     status: _status,
@@ -238,6 +262,7 @@ class _EditAssetScreenState extends State<EditAssetScreen> {
     _purchaseValueController.dispose();
     _currentValueController.dispose();
     _notesController.dispose();
+    _creditValueController.dispose();
     super.dispose();
   }
 } 
