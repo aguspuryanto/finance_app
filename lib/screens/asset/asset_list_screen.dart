@@ -5,8 +5,22 @@ import '../../providers/asset_provider.dart';
 import 'add_asset_screen.dart';
 import 'edit_asset_screen.dart';
 
-class AssetListScreen extends StatelessWidget {
+class AssetListScreen extends StatefulWidget {
   const AssetListScreen({super.key});
+
+  @override
+  State<AssetListScreen> createState() => _AssetListScreenState();
+}
+
+class _AssetListScreenState extends State<AssetListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Fetch assets when screen opens
+    Future.microtask(() => 
+      Provider.of<AssetProvider>(context, listen: false).fetchAssets()
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

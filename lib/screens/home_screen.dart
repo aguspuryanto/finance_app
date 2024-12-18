@@ -107,6 +107,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             ),
+            ListTile(
+              leading: const Icon(Icons.account_balance_wallet),
+              title: const Text('Aset'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AssetListScreen(),
+                  ),
+                );
+              },
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.info_outline),
@@ -123,19 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Aplikasi untuk mencatat dan mengelola keuangan pribadi.',
                     ),
                   ],
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.account_balance_wallet),
-              title: const Text('Aset'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AssetListScreen(),
-                  ),
                 );
               },
             ),
