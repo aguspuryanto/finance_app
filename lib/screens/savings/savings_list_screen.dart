@@ -65,21 +65,6 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
     }
   }
 
-  IconData _getTypeIcon(String type) {
-    switch (type) {
-      case 'Total':
-        return Icons.account_balance_wallet;
-      case 'Umroh':
-        return Icons.mosque;
-      case 'Dana Darurat':
-        return Icons.emergency;
-      case 'Pensiun':
-        return Icons.elderly;
-      default:
-        return Icons.savings;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(
@@ -93,9 +78,6 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
     for (var savings in savingsList) {
       totalPerType[savings.type] = (totalPerType[savings.type] ?? 0) + savings.amount;
     }
-
-    // Calculate grand total
-    double grandTotal = totalPerType.values.fold(0, (sum, amount) => sum + amount);
 
     return Scaffold(
       appBar: AppBar(
@@ -117,107 +99,108 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
       body: Column(
         children: [
           // Summary Cards
-          AspectRatio(
-            aspectRatio: 1.5,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final isTablet = constraints.maxWidth > 600;
-                return GridView.builder(
-                  padding: const EdgeInsets.all(4),
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: isTablet ? 4 : 2,
-                    childAspectRatio: isTablet ? 2.0 : 1.6,
-                    crossAxisSpacing: 4,
-                    mainAxisSpacing: 4,
+          Card(
+            margin: const EdgeInsets.all(16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Summary',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  itemCount: 4,
-                  itemBuilder: (context, index) {
-                    String title;
-                    double amount;
-                    Color color;
-
-                    switch (index) {
-                      case 0:
-                        title = 'Total';
-                        amount = grandTotal;
-                        color = Theme.of(context).primaryColor;
-                        break;
-                      case 1:
-                        title = 'Umroh';
-                        amount = totalPerType['Umroh'] ?? 0;
-                        color = Colors.green;
-                        break;
-                      case 2:
-                        title = 'Dana Darurat';
-                        amount = totalPerType['Dana Darurat'] ?? 0;
-                        color = Colors.orange;
-                        break;
-                      default:
-                        title = 'Pensiun';
-                        amount = totalPerType['Pensiun'] ?? 0;
-                        color = Colors.blue;
-                    }
-
-                    return Card(
-                      elevation: 1,
-                      margin: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 16),
+                  // Total Row
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.account_balance_wallet,
+                        color: Colors.indigo,
+                        size: 16,
                       ),
-                      child: Container(
-                        padding: const EdgeInsets.all(1),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              color.withOpacity(0.1),
-                              color.withOpacity(0.05),
-                            ],
-                          ),
+                      const SizedBox(width: 8),
+                      const Text('Total'),
+                      const Spacer(),
+                      Text(
+                        currencyFormat.format(
+                          totalPerType.values.fold(0.0, (sum, amount) => sum + amount)
                         ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _getTypeIcon(title),
-                              size: 10,
-                              color: color,
-                            ),
-                            const SizedBox(width: 2),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    title,
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      color: color,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  Text(
-                                    currencyFormat.format(amount),
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: color,
-                                      letterSpacing: -0.3,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        style: const TextStyle(
+                          color: Colors.indigo,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    );
-                  },
-                );
-              },
+                    ],
+                  ),
+                  const Divider(height: 24),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.mosque,
+                        color: Colors.green,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('Umroh'),
+                      const Spacer(),
+                      Text(
+                        currencyFormat.format(totalPerType['Umroh'] ?? 0),
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.emergency,
+                        color: Colors.orange,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('Dana Darurat'),
+                      const Spacer(),
+                      Text(
+                        currencyFormat.format(totalPerType['Dana Darurat'] ?? 0),
+                        style: const TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.elderly,
+                        color: Colors.blue,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('Pensiun'),
+                      const Spacer(),
+                      Text(
+                        currencyFormat.format(totalPerType['Pensiun'] ?? 0),
+                        style: const TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
 
@@ -244,47 +227,111 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                         children: [
                           ...filteredList.map((savings) => Card(
                                 margin: const EdgeInsets.only(bottom: 16),
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.all(16),
-                                  title: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        currencyFormat.format(savings.amount),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      Text(
-                                        savings.type,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+                                child: Dismissible(
+                                  key: Key(savings.id.toString()),
+                                  background: Container(
+                                    color: Colors.red.shade100,
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    alignment: Alignment.centerRight,
+                                    child: Icon(
+                                      Icons.delete_outline,
+                                      color: Colors.red.shade700,
+                                    ),
                                   ),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        'Tanggal: ${savings.date}',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      if (savings.notes != null && savings.notes!.isNotEmpty) ...[
-                                        const SizedBox(height: 4),
+                                  direction: DismissDirection.endToStart,
+                                  confirmDismiss: (direction) async {
+                                    return await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Konfirmasi'),
+                                          content: const Text('Yakin ingin menghapus tabungan ini?'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(false),
+                                              child: const Text('Batal'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(true),
+                                              child: const Text(
+                                                'Hapus',
+                                                style: TextStyle(color: Colors.red),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                  onDismissed: (direction) async {
+                                    try {
+                                      await Supabase.instance.client
+                                          .from('savings')
+                                          .delete()
+                                          .eq('id', savings.id);
+                                      
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Tabungan berhasil dihapus'),
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                        _loadSavings(); // Refresh data
+                                      }
+                                    } catch (e) {
+                                      if (mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('Error: $e'),
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  },
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.all(16),
+                                    title: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
                                         Text(
-                                          savings.notes!,
+                                          currencyFormat.format(savings.amount),
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(
+                                          savings.type,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    subtitle: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'Tanggal: ${savings.date}',
                                           style: TextStyle(
                                             color: Colors.grey[600],
                                           ),
                                         ),
+                                        if (savings.notes != null && savings.notes!.isNotEmpty) ...[
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            savings.notes!,
+                                            style: TextStyle(
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
                                       ],
-                                    ],
+                                    ),
                                   ),
                                 ),
                               )),
