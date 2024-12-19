@@ -12,15 +12,32 @@ class SavingsListScreen extends StatefulWidget {
   State<SavingsListScreen> createState() => _SavingsListScreenState();
 }
 
-class _SavingsListScreenState extends State<SavingsListScreen> {
+class _SavingsListScreenState extends State<SavingsListScreen> with SingleTickerProviderStateMixin {
   List<Savings> savingsList = [];
   bool isLoading = true;
   String _selectedType = 'Semua';
+  late TabController _tabController;
+  final List<String> _tabTypes = ['Semua', 'Umroh', 'Dana Darurat', 'Pensiun'];
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: _tabTypes.length, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {
+          _selectedType = _tabTypes[_tabController.index];
+        });
+        _loadSavings();
+      }
+    });
     _loadSavings();
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadSavings() async {
@@ -62,6 +79,9 @@ class _SavingsListScreenState extends State<SavingsListScreen> {
       totalPerType[savings.type] = (totalPerType[savings.type] ?? 0) + savings.amount;
     }
 
+    // Calculate grand total
+    double grandTotal = totalPerType.values.fold(0, (sum, amount) => sum + amount);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tabungan'),
@@ -89,15 +109,16 @@ class _SavingsListScreenState extends State<SavingsListScreen> {
               children: [
                 // Total per type cards in grid
                 GridView.count(
-                  crossAxisCount: 3,
+                  crossAxisCount: 4,
                   mainAxisSpacing: 6,
                   crossAxisSpacing: 6,
                   childAspectRatio: 1.5,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
-                  children: ['Umroh', 'Dana Darurat', 'Pensiun'].map((type) {
-                    return Card(
+                  children: [
+                    // Add total card first
+                    Card(
                       margin: EdgeInsets.zero,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -106,9 +127,9 @@ class _SavingsListScreenState extends State<SavingsListScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(
-                              type,
-                              style: const TextStyle(
+                            const Text(
+                              'Total',
+                              style: TextStyle(
                                 fontSize: 11,
                                 color: Colors.grey,
                               ),
@@ -117,7 +138,7 @@ class _SavingsListScreenState extends State<SavingsListScreen> {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              currencyFormat.format(totalPerType[type] ?? 0),
+                              currencyFormat.format(grandTotal),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.bold,
@@ -128,48 +149,50 @@ class _SavingsListScreenState extends State<SavingsListScreen> {
                           ],
                         ),
                       ),
-                    );
-                  }).toList(),
+                    ),
+                    ...['Umroh', 'Dana Darurat', 'Pensiun'].map((type) {
+                      return Card(
+                        margin: EdgeInsets.zero,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                type,
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.grey,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                currencyFormat.format(totalPerType[type] ?? 0),
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 
                 // Savings type filters
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      FilterChip(
-                        label: const Text('Semua'),
-                        selected: _selectedType == 'Semua',
-                        onSelected: (bool selected) {
-                          if (selected) {
-                            setState(() {
-                              _selectedType = 'Semua';
-                            });
-                            _loadSavings();
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ...['Umroh', 'Dana Darurat', 'Pensiun'].map((type) =>
-                        Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: FilterChip(
-                            label: Text(type),
-                            selected: _selectedType == type,
-                            onSelected: (bool selected) {
-                              if (selected) {
-                                setState(() {
-                                  _selectedType = type;
-                                });
-                                _loadSavings();
-                              }
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                TabBar(
+                  controller: _tabController,
+                  isScrollable: true,
+                  tabs: _tabTypes.map((type) => Tab(text: type)).toList(),
                 ),
                 const SizedBox(height: 16),
                 
