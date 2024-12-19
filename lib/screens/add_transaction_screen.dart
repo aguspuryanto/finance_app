@@ -5,7 +5,12 @@ import '../providers/category_provider.dart';
 import 'manage_category_screen.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  final Map<String, dynamic>? transaction;
+
+  const AddTransactionScreen({
+    super.key,
+    this.transaction,
+  });
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -16,13 +21,23 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
 
   String _selectedType = 'Pemasukan'; // Default jenis transaksi
   String _selectedCategory = ''; // Kategori yang dipilih
+  DateTime _selectedDate = DateTime.now();
 
   @override
   void initState() {
     super.initState();
+    if (widget.transaction != null) {
+      _titleController.text = widget.transaction!['title'];
+      _amountController.text = widget.transaction!['amount'].toString();
+      _selectedType = widget.transaction!['type'];
+      _selectedCategory = widget.transaction!['category'];
+      _selectedDate = DateTime.parse(widget.transaction!['date']);
+      _notesController.text = widget.transaction!['notes'] ?? '';
+    }
     Provider.of<CategoryProvider>(context, listen: false)
         .fetchCategories(_selectedType);
   }

@@ -65,6 +65,21 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
     }
   }
 
+  IconData _getTypeIcon(String type) {
+    switch (type) {
+      case 'Total':
+        return Icons.account_balance_wallet;
+      case 'Umroh':
+        return Icons.mosque;
+      case 'Dana Darurat':
+        return Icons.emergency;
+      case 'Pensiun':
+        return Icons.elderly;
+      default:
+        return Icons.savings;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final currencyFormat = NumberFormat.currency(
@@ -151,7 +166,7 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.all(1),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
@@ -162,32 +177,38 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                             ],
                           ),
                         ),
-                        child: Column(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              title,
-                              style: TextStyle(
-                                fontSize: isTablet ? 13 : 11,
-                                color: color,
-                                fontWeight: FontWeight.w500,
-                              ),
+                            Icon(
+                              _getTypeIcon(title),
+                              size: 10,
+                              color: color,
                             ),
-                            const SizedBox(height: 1),
+                            const SizedBox(width: 2),
                             Expanded(
-                              child: FittedBox(
-                                fit: BoxFit.contain,
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  currencyFormat.format(amount),
-                                  style: TextStyle(
-                                    fontSize: isTablet ? 15 : 13,
-                                    fontWeight: FontWeight.bold,
-                                    color: color,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    title,
+                                    style: TextStyle(
+                                      fontSize: 8,
+                                      color: color,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
+                                  Text(
+                                    currencyFormat.format(amount),
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: color,
+                                      letterSpacing: -0.3,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -266,7 +287,7 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                                     ],
                                   ),
                                 ),
-                              )).toList(),
+                              )),
                         ],
                       );
                     }).toList(),

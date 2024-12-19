@@ -3,14 +3,15 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/sub_transaction.dart';
 import 'sub_transaction_form.dart';
+import 'add_transaction_screen.dart';
 
 class TransactionDetailScreen extends StatefulWidget {
   final Map<String, dynamic> transaction;
 
   const TransactionDetailScreen({
-    Key? key,
+    super.key,
     required this.transaction,
-  }) : super(key: key);
+  });
 
   @override
   State<TransactionDetailScreen> createState() => _TransactionDetailScreenState();
@@ -29,20 +30,37 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
   Future<void> _loadSubTransactions() async {
     final supabase = Supabase.instance.client;
     try {
+      debugPrint('Loading sub-transactions for transaction ID: ${widget.transaction['id']}');
+
       final response = await supabase
           .from('sub_transactions')
           .select()
           .eq('transaction_id', widget.transaction['id'])
           .order('date', ascending: false);
       
-      setState(() {
-        subTransactions = (response as List)
-            .map((item) => SubTransaction.fromJson(item))
-            .toList();
-        isLoading = false;
-      });
-    } catch (e) {
+      debugPrint('Raw response from sub_transactions: $response');
+      
+      if (response.isNotEmpty) {
+        setState(() {
+          subTransactions = response
+              .map((item) => SubTransaction.fromJson(item))
+              .toList();
+          isLoading = false;
+        });
+        
+        for (var sub in subTransactions) {
+          debugPrint('Loaded sub-transaction: ${sub.title} - ${sub.amount}');
+        }
+      } else {
+        debugPrint('Response is empty or not a List');
+        setState(() {
+          subTransactions = [];
+          isLoading = false;
+        });
+      }
+    } catch (e, stackTrace) {
       debugPrint('Error loading sub transactions: $e');
+      debugPrint('Stack trace: $stackTrace');
       setState(() => isLoading = false);
     }
   }
@@ -62,7 +80,18 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              // TODO: Implement edit transaction
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddTransactionScreen(
+                    transaction: widget.transaction,
+                  ),
+                ),
+              ).then((updated) {
+                if (updated == true) {
+                  Navigator.pop(context, true);
+                }
+              });
             },
           ),
         ],
@@ -143,33 +172,47 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 const SizedBox(height: 8),
                 
                 // Sub transactions list
-                ...subTransactions.map((sub) => Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    title: Text(sub.title),
-                    subtitle: Text(sub.date),
-                    trailing: Text(
-                      currencyFormat.format(sub.amount),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubTransactionForm(
-                            parentTransaction: widget.transaction,
-                            subTransaction: sub,
+                if (subTransactions.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Text('Belum ada sub transaksi'),
+                  )
+                else
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: subTransactions.length,
+                    itemBuilder: (context, index) {
+                      final sub = subTransactions[index];
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        child: ListTile(
+                          title: Text(sub.title),
+                          subtitle: Text(sub.date),
+                          trailing: Text(
+                            currencyFormat.format(sub.amount),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
+                          onTap: () async {
+                            final result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => SubTransactionForm(
+                                  parentTransaction: widget.transaction,
+                                  subTransaction: sub,
+                                ),
+                              ),
+                            );
+                            if (result == true) {
+                              _loadSubTransactions();
+                            }
+                          },
                         ),
                       );
-                      if (result == true) {
-                        _loadSubTransactions();
-                      }
                     },
                   ),
-                )).toList(),
               ],
             ),
     );
