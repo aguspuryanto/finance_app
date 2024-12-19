@@ -101,14 +101,14 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
             },
           ),
         ],
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // Total per type cards in grid
-                GridView.count(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(160), // Memperbesar ukuran dari 120 ke 160
+          child: Column(
+            children: [
+              // Total cards grid
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: GridView.count(
                   crossAxisCount: 4,
                   mainAxisSpacing: 6,
                   crossAxisSpacing: 6,
@@ -117,7 +117,7 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                   physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.zero,
                   children: [
-                    // Add total card first
+                    // Total card
                     Card(
                       margin: EdgeInsets.zero,
                       child: Padding(
@@ -186,64 +186,78 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                     }).toList(),
                   ],
                 ),
-                const SizedBox(height: 16),
-                
-                // Savings type filters
-                TabBar(
-                  controller: _tabController,
-                  isScrollable: true,
-                  tabs: _tabTypes.map((type) => Tab(text: type)).toList(),
-                ),
-                const SizedBox(height: 16),
-                
-                // Savings cards
-                ...savingsList.map((savings) => Card(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          currencyFormat.format(savings.amount),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          savings.type,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        Text(
-                          'Tanggal: ${savings.date}',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                        if (savings.notes != null && savings.notes!.isNotEmpty) ...[
-                          const SizedBox(height: 4),
-                          Text(
-                            savings.notes!,
-                            style: TextStyle(
-                              color: Colors.grey[600],
+              ),
+              // TabBar
+              TabBar(
+                controller: _tabController,
+                isScrollable: true,
+                tabs: _tabTypes.map((type) => Tab(text: type)).toList(),
+              ),
+            ],
+          ),
+        ),
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : TabBarView(
+              controller: _tabController,
+              children: _tabTypes.map((type) {
+                final filteredList = type == 'Semua' 
+                    ? savingsList 
+                    : savingsList.where((saving) => saving.type == type).toList();
+
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    ...filteredList.map((savings) => Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              currencyFormat.format(savings.amount),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ),
-                )).toList(),
-              ],
+                            Text(
+                              savings.type,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 8),
+                            Text(
+                              'Tanggal: ${savings.date}',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            if (savings.notes != null && savings.notes!.isNotEmpty) ...[
+                              const SizedBox(height: 4),
+                              Text(
+                                savings.notes!,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    )).toList(),
+                  ],
+                );
+              }).toList(),
             ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
