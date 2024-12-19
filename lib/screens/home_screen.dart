@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'reports/weekly_report_screen.dart';
 import 'reports/monthly_report_screen.dart';
 import 'asset/asset_list_screen.dart';
+import 'transaction_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -261,9 +262,23 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                         ),
-                        SizedBox(
-                          height: 220,
-                          child: _buildPieChart(totalIncome, totalExpense),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Card(
+                            elevation: 2,
+                            color: Colors.grey[100],
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: SizedBox(
+                                height: 220,
+                                child: _buildPieChart(totalIncome, totalExpense),
+                              ),
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 16),
                       ],
@@ -368,20 +383,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                         horizontal: 16,
                                         vertical: 8,
                                       ),
-                                      leading: CircleAvatar(
-                                        radius: 24,
-                                        backgroundColor: tx['type'] == 'Pemasukan'
-                                            ? Colors.green[50]
-                                            : Colors.red[50],
-                                        child: Icon(
-                                          tx['type'] == 'Pemasukan'
-                                              ? Icons.arrow_downward
-                                              : Icons.arrow_upward,
-                                          color: tx['type'] == 'Pemasukan'
-                                              ? Colors.green
-                                              : Colors.red,
-                                        ),
-                                      ),
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => TransactionDetailScreen(transaction: tx),
+                                          ),
+                                        );
+                                      },
                                       title: Text(
                                         tx['title'],
                                         style: const TextStyle(
@@ -409,45 +418,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize: 15,
                                             ),
                                           ),
-                                          IconButton(
-                                            icon: const Icon(Icons.delete_outline),
-                                            color: Colors.red[300],
-                                            onPressed: () async {
-                                              final confirm = await showDialog<bool>(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: const Text('Konfirmasi'),
-                                                    content: const Text('Yakin ingin menghapus transaksi ini?'),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        onPressed: () => Navigator.of(context).pop(false),
-                                                        child: const Text('Batal'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () => Navigator.of(context).pop(true),
-                                                        child: const Text(
-                                                          'Hapus',
-                                                          style: TextStyle(color: Colors.red),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-
-                                              if (confirm == true) {
-                                                transactionProvider.deleteTransaction(tx['id']);
-                                                if (context.mounted) {
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text('Transaksi berhasil dihapus'),
-                                                      behavior: SnackBarBehavior.floating,
-                                                    ),
-                                                  );
-                                                }
-                                              }
-                                            },
+                                          const SizedBox(width: 4),
+                                          Icon(
+                                            Icons.chevron_right,
+                                            color: Colors.grey[400],
                                           ),
                                         ],
                                       ),
@@ -524,31 +498,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildPieChart(double income, double expense) {
     return PieChart(
       PieChartData(
+        sectionsSpace: 0,
+        centerSpaceRadius: 40,
         sections: [
           PieChartSectionData(
             value: income,
-            color: Colors.green,
             title: 'Pemasukan',
-            radius: 60,
+            color: Colors.green,
+            radius: 100,
             titleStyle: const TextStyle(
-              color: Colors.white,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
           PieChartSectionData(
             value: expense,
-            color: Colors.red,
             title: 'Pengeluaran',
-            radius: 60,
+            color: Colors.red,
+            radius: 100,
             titleStyle: const TextStyle(
-              color: Colors.white,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
           ),
         ],
-        sectionsSpace: 2,
-        centerSpaceRadius: 40,
-        startDegreeOffset: 90,
       ),
     );
   }
