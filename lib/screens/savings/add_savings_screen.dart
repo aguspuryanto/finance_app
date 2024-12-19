@@ -135,9 +135,15 @@ class _AddSavingsScreenState extends State<AddSavingsScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _saveSavings,
-        icon: const Icon(Icons.save),
-        label: const Text('Simpan'),
+        onPressed: _isLoading ? null : _saveSavings,
+        icon: _isLoading 
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(color: Colors.white),
+              )
+            : const Icon(Icons.save),
+        label: Text(_isLoading ? 'Menyimpan...' : 'Simpan'),
       ),
     );
   }
