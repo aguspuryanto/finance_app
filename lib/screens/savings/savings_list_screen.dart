@@ -94,171 +94,186 @@ class _SavingsListScreenState extends State<SavingsListScreen> with SingleTicker
                 MaterialPageRoute(
                   builder: (context) => const ManageSavingsTypesScreen(),
                 ),
-              ).then((_) {
-                // Reload data ketika kembali dari screen manajemen
-                _loadSavings();
-              });
+              ).then((_) => _loadSavings());
             },
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(160), // Memperbesar ukuran dari 120 ke 160
-          child: Column(
-            children: [
-              // Total cards grid
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: GridView.count(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 6,
-                  crossAxisSpacing: 6,
-                  childAspectRatio: 1.5,
-                  shrinkWrap: true,
+      ),
+      body: Column(
+        children: [
+          // Summary Cards
+          AspectRatio(
+            aspectRatio: 1.5,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isTablet = constraints.maxWidth > 600;
+                return GridView.builder(
+                  padding: const EdgeInsets.all(4),
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.zero,
-                  children: [
-                    // Total card
-                    Card(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isTablet ? 4 : 2,
+                    childAspectRatio: isTablet ? 2.0 : 1.6,
+                    crossAxisSpacing: 4,
+                    mainAxisSpacing: 4,
+                  ),
+                  itemCount: 4,
+                  itemBuilder: (context, index) {
+                    String title;
+                    double amount;
+                    Color color;
+
+                    switch (index) {
+                      case 0:
+                        title = 'Total';
+                        amount = grandTotal;
+                        color = Theme.of(context).primaryColor;
+                        break;
+                      case 1:
+                        title = 'Umroh';
+                        amount = totalPerType['Umroh'] ?? 0;
+                        color = Colors.green;
+                        break;
+                      case 2:
+                        title = 'Dana Darurat';
+                        amount = totalPerType['Dana Darurat'] ?? 0;
+                        color = Colors.orange;
+                        break;
+                      default:
+                        title = 'Pensiun';
+                        amount = totalPerType['Pensiun'] ?? 0;
+                        color = Colors.blue;
+                    }
+
+                    return Card(
+                      elevation: 1,
                       margin: EdgeInsets.zero,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text(
-                              'Total',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: Colors.grey,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              currencyFormat.format(grandTotal),
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    ),
-                    ...['Umroh', 'Dana Darurat', 'Pensiun'].map((type) {
-                      return Card(
-                        margin: EdgeInsets.zero,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                type,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Colors.grey,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                currencyFormat.format(totalPerType[type] ?? 0),
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              color.withOpacity(0.1),
+                              color.withOpacity(0.05),
                             ],
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ],
-                ),
-              ),
-              // TabBar
-              TabBar(
-                controller: _tabController,
-                isScrollable: true,
-                tabs: _tabTypes.map((type) => Tab(text: type)).toList(),
-              ),
-            ],
-          ),
-        ),
-      ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: _tabTypes.map((type) {
-                final filteredList = type == 'Semua' 
-                    ? savingsList 
-                    : savingsList.where((saving) => saving.type == type).toList();
-
-                return ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    ...filteredList.map((savings) => Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        title: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              currencyFormat.format(savings.amount),
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              savings.type,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        subtitle: Column(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 8),
                             Text(
-                              'Tanggal: ${savings.date}',
+                              title,
                               style: TextStyle(
-                                color: Colors.grey[600],
+                                fontSize: isTablet ? 13 : 11,
+                                color: color,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                            if (savings.notes != null && savings.notes!.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Text(
-                                savings.notes!,
-                                style: TextStyle(
-                                  color: Colors.grey[600],
+                            const SizedBox(height: 1),
+                            Expanded(
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  currencyFormat.format(amount),
+                                  style: TextStyle(
+                                    fontSize: isTablet ? 15 : 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: color,
+                                  ),
                                 ),
                               ),
-                            ],
+                            ),
                           ],
                         ),
                       ),
-                    )).toList(),
-                  ],
+                    );
+                  },
                 );
-              }).toList(),
+              },
             ),
+          ),
+
+          // TabBar
+          TabBar(
+            controller: _tabController,
+            isScrollable: true,
+            tabs: _tabTypes.map((type) => Tab(text: type)).toList(),
+          ),
+
+          // TabBarView with transactions
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : TabBarView(
+                    controller: _tabController,
+                    children: _tabTypes.map((type) {
+                      final filteredList = type == 'Semua'
+                          ? savingsList
+                          : savingsList.where((saving) => saving.type == type).toList();
+
+                      return ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          ...filteredList.map((savings) => Card(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.all(16),
+                                  title: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        currencyFormat.format(savings.amount),
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Text(
+                                        savings.type,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Tanggal: ${savings.date}',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      if (savings.notes != null && savings.notes!.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          savings.notes!,
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+                              )).toList(),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
           final result = await Navigator.push(
