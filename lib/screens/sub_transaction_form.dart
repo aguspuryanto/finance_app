@@ -7,10 +7,10 @@ class SubTransactionForm extends StatefulWidget {
   final SubTransaction? subTransaction;
 
   const SubTransactionForm({
-    Key? key,
+    super.key,
     required this.parentTransaction,
     this.subTransaction,
-  }) : super(key: key);
+  });
 
   @override
   State<SubTransactionForm> createState() => _SubTransactionFormState();

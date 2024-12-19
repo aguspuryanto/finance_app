@@ -9,6 +9,7 @@ import 'reports/weekly_report_screen.dart';
 import 'reports/monthly_report_screen.dart';
 import 'asset/asset_list_screen.dart';
 import 'transaction_detail_screen.dart';
+import 'savings/savings_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -117,6 +118,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const AssetListScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.savings),
+              title: const Text('Tabungan'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SavingsListScreen(),
                   ),
                 );
               },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/sub_transaction.dart';
+import 'sub_transaction_form.dart';
 
 class TransactionDetailScreen extends StatefulWidget {
   final Map<String, dynamic> transaction;
@@ -122,8 +124,18 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     TextButton.icon(
                       icon: const Icon(Icons.add),
                       label: const Text('Tambah'),
-                      onPressed: () {
-                        // TODO: Implement add sub transaction
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SubTransactionForm(
+                              parentTransaction: widget.transaction,
+                            ),
+                          ),
+                        );
+                        if (result == true) {
+                          _loadSubTransactions();
+                        }
                       },
                     ),
                   ],
@@ -142,8 +154,19 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    onTap: () {
-                      // TODO: Implement edit sub transaction
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SubTransactionForm(
+                            parentTransaction: widget.transaction,
+                            subTransaction: sub,
+                          ),
+                        ),
+                      );
+                      if (result == true) {
+                        _loadSubTransactions();
+                      }
                     },
                   ),
                 )).toList(),
