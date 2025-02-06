@@ -1,5 +1,6 @@
-Aplikasi Finance
+**Aplikasi Finance**
 Integrasi dengan supabase, Codeigniter 4.
+
 Themes: https://themekita.com/demo-ready-bootstrap/
 
 Supabase client for PHP:
