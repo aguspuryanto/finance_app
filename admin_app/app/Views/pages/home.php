@@ -21,6 +21,7 @@
                                                         <th>Amount</th>
                                                         <th>Type</th>
                                                         <th>Date</th>
+                                                        <th>Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -31,6 +32,9 @@
                                                             <td><?= $transaction['amount'] ?></td>
                                                             <td><?= $transaction['type'] . ' -' . $transaction['category'] ?></td>
                                                             <td><?= $transaction['date'] ?></td>
+                                                            <td>
+                                                                <a href="<?= base_url('edit/' . $transaction['id']) ?>"><i class="la la-edit"></i></a>
+                                                            </td>
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 </tbody>

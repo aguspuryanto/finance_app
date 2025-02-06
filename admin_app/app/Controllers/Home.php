@@ -30,4 +30,30 @@ class Home extends BaseController
             'listTransactions' => $listTransactions
         ]);
     }
+
+    public function edit($id)
+    {
+        $data = $this->client->filter('transactions', $id);
+        // print_r($data);
+        return view('pages/edit', [
+            'data' => $data
+        ]);
+    }
+
+    public function update()
+    {
+        // print_r($_POST);
+        // updated data
+        $data = [
+            'title' => $_POST['title'],
+            'amount' => $_POST['amount'],
+            'date' => date('Y-m-d H:i:s', strtotime($_POST['date'])),
+            'category' => $_POST['category'],
+            // 'description' => $_POST['description'],
+            'type' => $_POST['type']
+        ];
+
+        $this->client->updateData('transactions', $_POST['id'], $data);
+        return redirect()->to('/')->with('success', 'Data berhasil diubah');
+    }
 }
