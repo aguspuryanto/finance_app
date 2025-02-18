@@ -40,17 +40,33 @@
 							<a href="<?= base_url('/') ?>">
 								<i class="la la-dashboard"></i>
 								<p>Dashboard</p>
-								<!-- <span class="badge badge-count">5</span> -->
-							</a>
-						</li>
-						<!-- <li class="nav-item">
-							<a href="components.html">
-								<i class="la la-table"></i>
-								<p>Components</p>
-								<span class="badge badge-count">14</span>
 							</a>
 						</li>
 						<li class="nav-item">
+							<a href="<?= base_url('kategori') ?>">
+								<i class="la la-table"></i>
+								<p>Kategori</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="<?= base_url('laporan') ?>">
+								<i class="la la-book"></i>
+								<p>Laporan</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="<?= base_url('asset') ?>">
+								<i class="la la-building"></i>
+								<p>Asset</p>
+							</a>
+						</li>
+						<li class="nav-item">
+							<a href="<?= base_url('tabungan') ?>">
+								<i class="la la-bank"></i>
+								<p>Tabungan</p>
+							</a>
+						</li>
+						<!-- <li class="nav-item">
 							<a href="forms.html">
 								<i class="la la-keyboard-o"></i>
 								<p>Forms</p>

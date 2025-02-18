@@ -6,6 +6,25 @@
 					<div class="container-fluid">
 						<h4 class="page-title">Dashboard</h4>
 						<div class="row">
+                            <div class="col-md-6">
+                                <div class="card bg-success">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Total Pemasukan</h4>
+                                        <h5 class="card-text">Rp. <?= number_format($totalPemasukan, 0, ',', '.') ?></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-danger">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Total Pengeluaran</h4>
+                                        <h5 class="card-text">Rp. <?= number_format($totalPengeluaran, 0, ',', '.') ?></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+						<div class="row">
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header">
@@ -29,7 +48,7 @@
                                                         <tr>
                                                             <td><?= $transaction['id'] ?></td>
                                                             <td><?= $transaction['title'] ?></td>
-                                                            <td><?= $transaction['amount'] ?></td>
+                                                            <td>Rp. <?= number_format($transaction['amount'], 0, ',', '.') ?></td>
                                                             <td><?= $transaction['type'] . ' -' . $transaction['category'] ?></td>
                                                             <td><?= $transaction['date'] ?></td>
                                                             <td>
