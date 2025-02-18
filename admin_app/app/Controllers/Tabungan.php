@@ -23,6 +23,8 @@ class Tabungan extends BaseController
     public function index()
     {
         $listTabungan = $this->client->getAllData('savings');
+        asort($listTabungan, SORT_ASC);
+        
         return view('pages/tabungan', [
             'title' => 'Tabungan',
             'listTabungan' => $listTabungan

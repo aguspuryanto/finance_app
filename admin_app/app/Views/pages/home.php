@@ -6,7 +6,15 @@
 					<div class="container-fluid">
 						<h4 class="page-title">Dashboard</h4>
 						<div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="card bg-primary">
+                                    <div class="card-body text-white">
+                                        <h4 class="card-title text-white">Saldo</h4>
+                                        <h5 class="card-text">Rp. <?= number_format($totalPemasukan - $totalPengeluaran, 0, ',', '.') ?></h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="card bg-success">
                                     <div class="card-body">
                                         <h4 class="card-title">Total Pemasukan</h4>
@@ -14,7 +22,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="card bg-danger">
                                     <div class="card-body">
                                         <h4 class="card-title">Total Pengeluaran</h4>
@@ -28,10 +36,13 @@
                             <div class="col-md-12">
                                 <div class="card">
                                     <div class="card-header">
-                                        <h4 class="card-title">List Transactions</h4>
+                                        <h4 class="card-title d-flex justify-content-between align-items-center">List Transactions
+                                            <a href="<?= base_url('create') ?>" class="btn btn-primary">Tambah Transaksi</a>
+                                        </h4>
                                     </div>
                                     <div class="card-body">
                                         <div class="table-responsive">
+                                            <!-- <?= json_encode($listTransactions) ?> -->
                                             <table class="table table-striped table-bordered" style="width:100%" id="listTransactions">
                                                 <thead>
                                                     <tr>
@@ -52,7 +63,8 @@
                                                             <td><?= $transaction['type'] . ' -' . $transaction['category'] ?></td>
                                                             <td><?= $transaction['date'] ?></td>
                                                             <td>
-                                                                <a href="<?= base_url('edit/' . $transaction['id']) ?>"><i class="la la-edit"></i></a>
+                                                                <a href="<?= base_url('edit/' . $transaction['id']) ?>" class="btn btn-primary"><i class="la la-edit"></i></a>
+                                                                <a href="<?= base_url('delete/' . $transaction['id']) ?>" class="btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')"><i class="la la-trash"></i></a>
                                                             </td>
                                                         </tr>
                                                     <?php endforeach; ?>

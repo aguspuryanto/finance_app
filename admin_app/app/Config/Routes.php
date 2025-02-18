@@ -9,6 +9,8 @@ use CodeIgniter\Router\RouteCollection;
 // group
 $routes->group('', [], function ($routes) {
     $routes->get('/', 'Home::index');
+    $routes->get('/create', 'Home::create');
+    $routes->post('/store', 'Home::store');
     $routes->get('/edit/(:num)', 'Home::edit/$1');
     $routes->post('/update', 'Home::update');
 });

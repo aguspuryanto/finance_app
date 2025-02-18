@@ -34,7 +34,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="category">Category</label>
-                                    <input type="text" name="category" value="<?= $data[0]['category'] ?>" class="form-control">
+                                    <select name="category" class="form-control">
+                                        <?php foreach ($listCategories as $category) : ?>
+                                            <option value="<?= $category['name'] ?>" <?= $data[0]['category'] == $category['name'] ? 'selected' : '' ?>><?= $category['name'] ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
                                 </div>
                                 <div class="d-flex">
                                     <div class="form-group col-md-6">
