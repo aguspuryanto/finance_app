@@ -14,7 +14,7 @@
 # ENVIRONMENT
 #--------------------------------------------------------------------
 
-# CI_ENVIRONMENT = production
+# CI_ENVIRONMENT = development
 
 #--------------------------------------------------------------------
 # APP
@@ -67,3 +67,7 @@
 #--------------------------------------------------------------------
 
 # logger.threshold = 4
+
+# Supabase Credentials
+SUPABASE_URL=https://cltgxntkqfjwuoyqeqmkNo.supabase.co
+SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsdGd4bnRrcWZqd3VveXFlcW1rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ0MDgyMTIsImV4cCI6MjA0OTk4NDIxMn0No.79zvM5HDq08kYn2w9XNilUBgd9RqnA1MHzt1f-nulG8
