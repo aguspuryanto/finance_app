@@ -12,6 +12,8 @@
     "require": {
         "php": "^8.1",
         "codeigniter4/framework": "^4.0",
+        "guzzlehttp/guzzle": "^7.9",
+        "openai-php/client": "^0.10.3",
         "rafaelwendel/phpsupabase": "^0.0.8",
         "supabase-php/supabase-client": "^1.1"
     },
@@ -37,7 +39,10 @@
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "php-http/discovery": true
+        }
     },
     "scripts": {
         "test": "phpunit"

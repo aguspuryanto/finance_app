@@ -46,3 +46,8 @@ $routes->group('laporan', [], function ($routes) {
     $routes->get('/create', 'Laporan::create');
     $routes->post('/store', 'Laporan::store');
 });
+
+// AI Summary
+$routes->group('ai-summary', [], function ($routes) {
+    $routes->post('/', 'Laporan::aiSummary');
+});

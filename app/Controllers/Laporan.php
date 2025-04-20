@@ -7,9 +7,12 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\HTTP\RedirectResponse;
 use Supabase\Functions as Supabase;
 use DateTime;
+use OpenAI\Client as OpenAI;
+
 class Laporan extends BaseController
 {   
     protected $client;
+    protected $openai;
 
     public function __construct()
     {
@@ -19,6 +22,7 @@ class Laporan extends BaseController
             'apikey' => $_ENV['SUPABASE_KEY']
         ];
         $this->client = new Supabase($config['url'], $config['apikey']);
+        // $this->openai = new OpenAI($_ENV['OPENAI_API_KEY']);
     }
 
     public function index()
@@ -78,5 +82,56 @@ class Laporan extends BaseController
             'totalPemasukan' => $totalPemasukan,
             'totalPengeluaran' => $totalPengeluaran
         ]);
+    }
+
+    public function aiSummary()
+    {
+        $instruction = $this->request->getVar('instruction');
+        $data = $this->request->getVar('data');
+        // $response = $this->client->aiSummary($instruction);
+
+        // using openai api
+        // ref: https://github.com/openai-php/client
+        $yourApiKey = $_ENV['OPENAI_API_KEY'];
+        // $client = \OpenAI::client($yourApiKey);
+        // $response = $client->chat()->create([
+        //     'model' => 'gpt-3.5-turbo',
+        //     'messages' => [
+        //         ['role' => 'user', 'content' => $data . "\n" . $instruction]
+        //     ]
+        // ]);
+
+        $options = [
+            CURLOPT_URL => "https://api.openai.com/v1/responses",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "POST",
+            CURLOPT_POSTFIELDS => json_encode(array(
+                "model" => "gpt-3.5-turbo",
+                "input" => $data . "\n" . $instruction
+            )),
+            CURLOPT_HTTPHEADER => [
+                "Authorization: Bearer " . $yourApiKey,
+                "Content-Type: application/json"
+            ],
+        ];
+
+        $curl = curl_init();
+        curl_setopt_array($curl, $options);
+        $response = curl_exec($curl);
+        curl_close($curl);
+
+        $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if ($http_code === 200) {
+            $response = json_decode($response, true);
+            echo $response['choices'][0]['message']['content'];
+        } else {
+            // return redirect()->to('/')->with('error', 'Failed to fetch data. Status code: ' . $http_code);
+            echo $response;
+        }
     }
 }

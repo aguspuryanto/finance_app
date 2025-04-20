@@ -68,6 +68,7 @@
                                                 </div>
                                             </div>
                                         </form>
+                                        <div id="ai-summary-result"></div>
                                     </div>
                                 </div>
 
@@ -219,6 +220,23 @@ foreach ($listTransactions as $transaction) {
             e.preventDefault();
             const instruction = $('#ai-instruction').val();
             console.log(instruction);
+            $.ajax({
+                url: '<?= base_url('ai-summary') ?>',
+                type: 'POST',
+                data: {
+                    instruction: instruction,
+                    data: '<?= json_encode($listTransactions) ?>'
+                },
+                success: function(response) {
+                    console.log(response);
+                    const data = JSON.parse(response);  
+                    if(data.error) {
+                        $('#ai-summary-result').html('<p class="text-white">'+data.error.message+'</p>');
+                    } else {
+                        $('#ai-summary-result').html('<p class="text-white">'+data.message+'</p>');
+                    }
+                }
+            });
         });
     });
 </script>
