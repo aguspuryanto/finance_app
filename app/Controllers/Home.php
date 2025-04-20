@@ -42,9 +42,9 @@ class Home extends BaseController
         $dateEndFormatted = $dateEnd->format('Y-m-d');
 
         // Filter data berdasarkan rentang tanggal
-        // $listTransactions = array_filter($listTransactions, function ($transaction) use ($dateStartFormatted, $dateEndFormatted) {
-        //     return $transaction['date'] >= $dateEndFormatted && $transaction['date'] <= $dateStartFormatted;
-        // });
+        $listTransactions = array_filter($listTransactions, function ($transaction) use ($dateStartFormatted, $dateEndFormatted) {
+            return $transaction['date'] >= $dateEndFormatted && $transaction['date'] <= $dateStartFormatted;
+        });
 
         // Hitung total pemasukan dan pengeluaran
         $totalPemasukan = 0;

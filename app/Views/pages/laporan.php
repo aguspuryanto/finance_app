@@ -57,6 +57,20 @@
                             </div>
 
                             <div class="col-md-12">
+                                <div class="card mb-0 bg-secondary">
+                                    <div class="card-body">
+                                        <form id="ai-summary">
+                                            <div class="form-group">
+                                                <label for="title">AI Summary</label>
+                                                <div class="input-group">
+                                                    <input type="text" name="ai-instruction" class="form-control" placeholder="AI Instruction">
+                                                    <button type="submit" class="btn btn-primary" id="ai-summary-btn">New Chat</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
                                 <div class="card">
                                     <div class="card-header">
                                         <h4 class="card-title float-left">List Transactions</h4>
@@ -80,19 +94,31 @@
                                                         <th>ID</th>
                                                         <th>Date</th>
                                                         <th>Title</th>
-                                                        <th>Type</th>
-                                                        <th>Amount</th>
+                                                        <th>Debet</th>
+                                                        <th>Credit</th>
+                                                        <th>Saldo</th>
                                                         <th>Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <?php foreach ($listTransactions as $transaction) : ?>
+                                                    <?php 
+                                                    $saldoAwal = 0;
+                                                    $saldoAkhir = 0;
+                                                    $i = 1;
+                                                    foreach ($listTransactions as $transaction) : 
+                                                        if($transaction['type'] == 'Pemasukan') {
+                                                            $saldoAkhir += $transaction['amount'];
+                                                        } else {
+                                                            $saldoAkhir -= $transaction['amount'];
+                                                        }
+                                                    ?>
                                                         <tr>
                                                             <td><?= $transaction['id'] ?></td>
                                                             <td><?= $transaction['date'] ?></td>
-                                                            <td><?= $transaction['title'] ?></td>
-                                                            <td><?= $transaction['type'] . ' -' . $transaction['category'] ?></td>
-                                                            <td>Rp. <span class="float-right"><?= number_format($transaction['amount'], 0, ',', '.') ?></span></td>
+                                                            <td><?= '<p>' . $transaction['title'] . '</p> <span class="badge badge-secondary">' . $transaction['category'] . '</span>' ?></td>
+                                                            <td><?= ($transaction['type'] == 'Pemasukan') ? 'Rp. ' . number_format($transaction['amount'], 0, ',', '.') : '' ?></td>
+                                                            <td><?= ($transaction['type'] == 'Pengeluaran') ? 'Rp. ' . number_format($transaction['amount'], 0, ',', '.') : '' ?></td>
+                                                            <td>Rp. <span class="float-right"><?= number_format($saldoAkhir, 0, ',', '.') ?></span></td>
                                                             <td>
                                                                 <a href="<?= base_url('edit/' . $transaction['id']) ?>" class="btn btn-primary"><i class="la la-edit"></i></a>
                                                             </td>
@@ -109,30 +135,17 @@
 				</div>
 
 <?php
-
 // echo json_encode($listTransactions);
 $dataChart = [];
 foreach ($listTransactions as $transaction) {
     $dataChart[] = [
         'title' => strtoupper($transaction['title']),
         'amount' => $transaction['amount'],
-        'type' => $transaction['type']
+        'type' => $transaction['type'],
+        'category' => $transaction['category']
     ];
 }
-// echo json_encode($dataChart);
-// Gabungkan jumlah amount jika title sama
-// $mergedData = array_reduce($dataChart, function ($acc, $curr) {
-//     $existing = array_filter($acc, function ($item) use ($curr) {
-//         return $item['title'] === $curr['title'];
-//     });
-//     if ($existing) {
-//         $existing[0]['amount'] += $curr['amount'];
-//     } else {
-//         $acc[] = $curr;
-//     }
-//     return $acc;
-// }, []);
-// echo json_encode($mergedData);
+
 ?>
 <?= $this->endSection() ?>
 <!-- register js -->
@@ -152,7 +165,7 @@ foreach ($listTransactions as $transaction) {
         const data = <?=json_encode($dataChart) ?>;
         // Gabungkan jumlah amount jika title sama
         const mergedData = data.reduce((acc, curr) => {
-            const existing = acc.find(item => item.title === curr.title);
+            const existing = acc.find(item => item.category === curr.category);
             if (existing) {
                 existing.amount += curr.amount;
             } else {
@@ -164,7 +177,8 @@ foreach ($listTransactions as $transaction) {
         // Sort data dari terbesar ke terkecil
         mergedData.sort((a, b) => b.amount - a.amount);
 
-        const labels = mergedData.map(item => item.title);
+        // const labels = mergedData.map(item => item.title);
+        const labels = mergedData.map(item => item.category);
         const pemasukanData = mergedData.map(item => item.type === "Pemasukan" ? item.amount : 0);
         const pengeluaranData = mergedData.map(item => item.type === "Pengeluaran" ? item.amount : 0);
 
@@ -198,6 +212,13 @@ foreach ($listTransactions as $transaction) {
                     }
                 }
             }
+        });
+
+        // AI Summary
+        $('#ai-summary-btn').click(function(e) {
+            e.preventDefault();
+            const instruction = $('#ai-instruction').val();
+            console.log(instruction);
         });
     });
 </script>
