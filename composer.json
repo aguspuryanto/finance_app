@@ -14,6 +14,7 @@
         "codeigniter4/framework": "^4.0",
         "guzzlehttp/guzzle": "^7.9",
         "openai-php/client": "^0.10.3",
+        "phpoffice/phpspreadsheet": "^4.2",
         "rafaelwendel/phpsupabase": "^0.0.8",
         "supabase-php/supabase-client": "^1.1"
     },

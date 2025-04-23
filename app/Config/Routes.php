@@ -42,9 +42,10 @@ $routes->group('tabungan', [], function ($routes) {
 
 // laporan
 $routes->group('laporan', [], function ($routes) {
-    $routes->add('/', 'Laporan::index');
-    $routes->get('/create', 'Laporan::create');
-    $routes->post('/store', 'Laporan::store');
+      $routes->add('/', 'Laporan::index');
+      $routes->get('/create', 'Laporan::create');
+      $routes->post('/store', 'Laporan::store');
+      $routes->get('export', 'Laporan::export');
 });
 
 // AI Summary

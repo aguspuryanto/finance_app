@@ -20,7 +20,7 @@
                     <?php
                     // echo "startDate: ". $startDate. "<br>";
                     // echo "endDate: ". $endDate. "<br>";
-                    // echo json_encode($listTransactions);
+                    echo json_encode($listTransactions);
                     ?>
 					<div class="container-fluid">
 						<h4 class="page-title mb-0">Dashboard</h4>
@@ -68,7 +68,7 @@
                                                 </div>
                                             </div>
                                         </form>
-                                        <div id="ai-summary-result"></div>
+                                        <div id="ai-summary-result" class="form-group"></div>
                                     </div>
                                 </div>
 
@@ -85,6 +85,7 @@
                                                     <?php endforeach; ?>
                                                 </select>
                                             </form>
+                                            <a href="<?= base_url('laporan/export') ?>" class="btn btn-success">Export</a>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -226,6 +227,9 @@ foreach ($listTransactions as $transaction) {
                 data: {
                     instruction: instruction,
                     data: '<?= json_encode($listTransactions) ?>'
+                },
+                beforeSend: function() {
+                    $('#ai-summary-result').html('<p class="text-white">Loading...</p>');
                 },
                 success: function(response) {
                     console.log(response);
