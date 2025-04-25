@@ -31,7 +31,9 @@ class Home extends BaseController
         asort($listTransactions, SORT_ASC);
 
         // Tanggal awal
-        $dateStart = new DateTime();
+        $dateStart = new DateTime('now', new \DateTimeZone("Asia/Jakarta"));
+        // $dateStart = (new \CodeIgniter\I18n\Time("now", "Asia/Jakarta", "id_ID"));
+        // print $dateStart->format('Y-m-d H:m:s');
 
         // Kurangi satu bulan dari tanggal awal
         $dateEnd = clone $dateStart;

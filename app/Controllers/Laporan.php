@@ -30,9 +30,9 @@ class Laporan extends BaseController
     public function index()
     {
         // $listTransactions = $this->client->getAllData('transactions');
-        $month = $this->request->getVar('month');
-        $startDate = ($month) ? date('Y-m-24', strtotime('-1 month', strtotime($month))) : date('Y-m-24', strtotime('last month'));
-        $endDate = ($month) ? date('Y-m-24', strtotime($month)) : new DateTime('now')->format('Y-m-d');
+        $currentMonth = $this->request->getVar('month');
+        $startDate = ($currentMonth) ? date('Y-m-25', strtotime('-1 month', strtotime($currentMonth))) : date('Y-m-25', strtotime('last month'));
+        $endDate = ($currentMonth) ? date('Y-m-25', strtotime($currentMonth)) : new DateTime('now', new \DateTimeZone("Asia/Jakarta"))->format('Y-m-d');
 
         // echo "startDate: ". $startDate. "<br>";
         // echo "endDate: ". $endDate. "<br>";
@@ -79,7 +79,9 @@ class Laporan extends BaseController
 
         return view('pages/laporan', [
             'title' => 'Laporan',
-            'getMonth' => $month,
+            'currentMonth' => $currentMonth,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
             'listTransactions' => $listTransactions,
             'totalPemasukan' => $totalPemasukan,
             'totalPengeluaran' => $totalPengeluaran
@@ -90,8 +92,8 @@ class Laporan extends BaseController
     {
         // $listTransactions = $this->client->getAllData('transactions');
         $month = $this->request->getVar('month');
-        $startDate = ($month) ? date('Y-m-24', strtotime('-1 month', strtotime($month))) : date('Y-m-24', strtotime('last month'));
-        $endDate = ($month) ? date('Y-m-24', strtotime($month)) : new DateTime('now')->format('Y-m-d');
+        $startDate = ($month) ? date('Y-m-25', strtotime('-1 month', strtotime($month))) : date('Y-m-25', strtotime('last month'));
+        $endDate = ($month) ? date('Y-m-25', strtotime($month)) : new DateTime('now')->format('Y-m-d');
 
         // echo "startDate: ". $startDate. "<br>";
         // echo "endDate: ". $endDate. "<br>";

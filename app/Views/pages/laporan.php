@@ -8,19 +8,19 @@
         '09' => 'September', '10' => 'Oktober', '11' => 'November', '12' => 'Desember'
     ];
     $currentYear = date('Y');
-    $currentMonth = date('m');
+    // $currentMonth = date('m');
 
     // echo esc($month);
-    $startDate = ($getMonth) ? date('Y-m-24', strtotime('-1 month', strtotime($getMonth))) : date('Y-m-24', strtotime('last month'));
-    $endDate = ($getMonth) ? date('Y-m-24', strtotime($getMonth)) : date('Y-m-24');
-    if($getMonth) $currentMonth = date('m', strtotime($getMonth));
+    // $startDate = ($getMonth) ? date('Y-m-24', strtotime('-1 month', strtotime($getMonth))) : date('Y-m-24', strtotime('last month'));
+    // $endDate = ($getMonth) ? date('Y-m-24', strtotime($getMonth)) : date('Y-m-24');
+    // if($getMonth) $currentMonth = date('m', strtotime($getMonth));
 ?>
     <!-- Your content here -->
 				<div class="content">
                     <?php
                     // echo "startDate: ". $startDate. "<br>";
                     // echo "endDate: ". $endDate. "<br>";
-                    echo json_encode($listTransactions);
+                    // echo json_encode($listTransactions);
                     ?>
 					<div class="container-fluid">
 						<h4 class="page-title mb-0">Dashboard</h4>
