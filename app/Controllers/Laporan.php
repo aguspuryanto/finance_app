@@ -30,9 +30,50 @@ class Laporan extends BaseController
     public function index()
     {
         // $listTransactions = $this->client->getAllData('transactions');
-        $currentMonth = $this->request->getVar('month');
-        $startDate = ($currentMonth) ? date('Y-m-25', strtotime('-1 month', strtotime($currentMonth))) : date('Y-m-25', strtotime('last month'));
-        $endDate = ($currentMonth) ? date('Y-m-25', strtotime($currentMonth)) : new DateTime('now', new \DateTimeZone("Asia/Jakarta"))->format('Y-m-d');
+        // $currentMonth = $this->request->getVar('month');
+        // $startDate = ($currentMonth) ? date('Y-m-26', strtotime('-1 month', strtotime($currentMonth))) : date('Y-m-26', strtotime('last month'));
+        // $endDate = ($currentMonth) ? date('Y-m-25', strtotime($currentMonth)) : new DateTime('now', new \DateTimeZone("Asia/Jakarta"))->format('Y-m-d');
+
+        // Mendapatkan tanggal hari ini
+        $today = new DateTime();
+
+        // Mendapatkan tanggal (1-31)
+        $currentDay = (int)$today->format('d');
+
+        // Mendapatkan bulan dan tahun saat ini
+        $currentMonth = (int)$today->format('m');
+        $currentYear = (int)$today->format('Y');
+
+        // Menentukan tanggal awal dan akhir laporan
+        if ($currentDay >= 25) {
+            // Jika hari ini tanggal 25, mulai dari 25 bulan ini
+            $startDate = new DateTime("$currentYear-$currentMonth-24");
+            // $endDate = new DateTime("$currentYear-$currentMonth-24");
+            // $endDate->modify('+1 month');
+            $endDate = new DateTime();
+        } else {
+            // Jika bukan tanggal 25, mulai dari 25 bulan sebelumnya
+            $startDate = new DateTime("$currentYear-$currentMonth-25");
+            $startDate->modify('-1 month');
+            
+            $endDate = new DateTime("$currentYear-$currentMonth-24");
+        }
+
+        if($this->request->getVar('month')){
+            $currentMonth = $this->request->getVar('month');
+            list($currentYear, $currentMonth) = explode('-', $currentMonth);
+            
+            $startDate = new DateTime("$currentYear-$currentMonth-25");
+            $startDate->modify('-1 month');
+            
+            $endDate = new DateTime("$currentYear-$currentMonth-24");
+        }
+
+        // Format tanggal untuk ditampilkan
+        $startDate = $startDate->format('Y-m-d');
+        $endDate = $endDate->format('Y-m-d');
+
+        // echo "Periode Laporan: $formattedStart sampai $formattedEnd";
 
         // echo "startDate: ". $startDate. "<br>";
         // echo "endDate: ". $endDate. "<br>";

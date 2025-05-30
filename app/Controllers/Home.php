@@ -25,7 +25,7 @@ class Home extends BaseController
     {
         $listTransactions = $this->client->getAllData('transactions');
         // $listTransactions = $this->client->pages('transactions', ['limit' => 100]);
-        // echo json_encode($listTransactions);
+        // echo json_encode($listTransactions); die();
         // $listTransactions = $listTransactions->{'date'};
 
         asort($listTransactions, SORT_ASC);
@@ -44,9 +44,9 @@ class Home extends BaseController
         $dateEndFormatted = $dateEnd->format('Y-m-d');
 
         // Filter data berdasarkan rentang tanggal
-        $listTransactions = array_filter($listTransactions, function ($transaction) use ($dateStartFormatted, $dateEndFormatted) {
-            return $transaction['date'] >= $dateEndFormatted && $transaction['date'] <= $dateStartFormatted;
-        });
+        // $listTransactions = array_filter($listTransactions, function ($transaction) use ($dateStartFormatted, $dateEndFormatted) {
+        //     return $transaction['date'] >= $dateEndFormatted && $transaction['date'] <= $dateStartFormatted;
+        // });
 
         // Hitung total pemasukan dan pengeluaran
         $totalPemasukan = 0;
@@ -59,7 +59,7 @@ class Home extends BaseController
             }
         }
 
-        // return view('welcome_message');
+        // echo json_encode($listTransactions); die();
         return view('pages/home', [
             'listTransactions' => $listTransactions,
             'totalPemasukan' => $totalPemasukan,

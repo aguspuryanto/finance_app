@@ -84,7 +84,8 @@
     $(document).ready(function() {
         // $('#listTransactions').DataTable();
         let table = new DataTable('#listTransactions', {
-            order: [[0, 'desc']]
+            order: [[0, 'desc']],
+            pageLength: 100
         });
     });
 </script>

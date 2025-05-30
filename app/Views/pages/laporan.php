@@ -13,7 +13,7 @@
     // echo esc($month);
     // $startDate = ($getMonth) ? date('Y-m-24', strtotime('-1 month', strtotime($getMonth))) : date('Y-m-24', strtotime('last month'));
     // $endDate = ($getMonth) ? date('Y-m-24', strtotime($getMonth)) : date('Y-m-24');
-    // if($getMonth) $currentMonth = date('m', strtotime($getMonth));
+    if(isset($_GET['month']) && $_GET['month'] != '') $currentMonth = date('Y-m', strtotime($_GET['month']));
 ?>
     <!-- Your content here -->
 				<div class="content">
@@ -77,15 +77,17 @@
                                         <h4 class="card-title float-left">List Transactions</h4>
                                         <div class="float-right">
                                             <form action="<?= base_url('laporan') ?>" method="get">
-                                                <select name="month" class="form-control" onchange="this.form.submit()">
-                                                    <?php foreach ($months as $num => $name): ?>
-                                                        <option value="<?= $currentYear . '-' . $num ?>" <?= ($num == $currentMonth) ? 'selected' : '' ?> <?= ($num > $currentMonth) ? 'disabled' : '' ?>>
-                                                            <?= $name . ', ' . $currentYear ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                </select>
+                                                <div class="input-group mb-3">
+                                                    <select name="month" class="form-control" onchange="this.form.submit()">
+                                                        <?php foreach ($months as $num => $name): ?>
+                                                            <option value="<?= $currentYear . '-' . $num ?>" <?= ($currentYear . '-' . $num == $currentMonth) ? 'selected' : '' ?> <?= ($num > $currentMonth) ? 'disabled' : '' ?>>
+                                                                <?= $name . ', ' . $currentYear ?>
+                                                            </option>
+                                                        <?php endforeach; ?>
+                                                    </select>
+                                                    <button type="button" class="btn btn-success" id="exportBtn">Export</button>
+                                                </div>
                                             </form>
-                                            <a href="<?= base_url('laporan/export') ?>" class="btn btn-success">Export</a>
                                         </div>
                                     </div>
                                     <div class="card-body">
@@ -241,6 +243,12 @@ foreach ($listTransactions as $transaction) {
                     }
                 }
             });
+        });
+
+        $('#exportBtn').click(function(e) {
+            e.preventDefault();
+            let month = $('select[name="month"]').val();
+            window.location.href = '<?= base_url('laporan/export') ?>?month=' + month;
         });
     });
 </script>

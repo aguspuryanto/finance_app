@@ -13,8 +13,8 @@ class Category extends ResourceController
     {
         // config, https://github.com/CodeWithSushil/supabase-client
         $config = [
-            'url' => $_ENV['SUPABASE_URL'],
-            'apikey' => $_ENV['SUPABASE_KEY']
+            'url' => $_ENV['NEXT_PUBLIC_SUPABASE_URL'],
+            'apikey' => $_ENV['NEXT_PUBLIC_SUPABASE_ANON_KEY']
         ];
         $this->client = new Supabase($config['url'], $config['apikey']);
     }
