@@ -25,13 +25,15 @@ class Home extends BaseController
     {
         $listTransactions = $this->client->getAllData('transactions');
         // $listTransactions = $this->client->pages('transactions', ['limit' => 100]);
-        // echo json_encode($listTransactions);
+        // echo json_encode($listTransactions); die();
         // $listTransactions = $listTransactions->{'date'};
 
         asort($listTransactions, SORT_ASC);
 
         // Tanggal awal
-        $dateStart = new DateTime();
+        $dateStart = new DateTime('now', new \DateTimeZone("Asia/Jakarta"));
+        // $dateStart = (new \CodeIgniter\I18n\Time("now", "Asia/Jakarta", "id_ID"));
+        // print $dateStart->format('Y-m-d H:m:s');
 
         // Kurangi satu bulan dari tanggal awal
         $dateEnd = clone $dateStart;
@@ -57,7 +59,7 @@ class Home extends BaseController
             }
         }
 
-        // return view('welcome_message');
+        // echo json_encode($listTransactions); die();
         return view('pages/home', [
             'listTransactions' => $listTransactions,
             'totalPemasukan' => $totalPemasukan,
